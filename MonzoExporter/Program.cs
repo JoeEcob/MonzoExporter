@@ -37,10 +37,11 @@ namespace MonzoExporter
                 var values = new List<IList<object>>();
                 foreach (var item in transactions)
                 {
-                    var description = item.Merchant?.Name == null ? item.Description : item.Merchant.Name;
+                    var payee = item.Merchant?.Name == null ? item.Description : item.Merchant.Name;
                     var amount = Convert.ToDecimal(item.Amount) / 100; // Convert from pence to pounds
+                    var balance = Convert.ToDecimal(item.AccountBalance) / 100;
 
-                    var cells = new string[] { description, item.Category, amount.ToString(), item.Created.ToString() };
+                    var cells = new string[] { item.Created.ToString(), payee, item.Category, item.Notes, amount.ToString(), balance.ToString() };
                     var row = new List<object>(cells);
 
                     values.Add(row);

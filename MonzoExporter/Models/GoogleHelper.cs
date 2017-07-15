@@ -39,7 +39,7 @@ namespace MonzoExporter.Models
                     var credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                         secrets,
                         new[] { SheetsService.Scope.Spreadsheets },
-                        "user",
+                        "monzo-exporter",
                         CancellationToken.None,
                         new FileDataStore(OAuthPath, true)
                     ).Result;
