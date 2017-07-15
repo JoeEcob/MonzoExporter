@@ -24,9 +24,13 @@ namespace MonzoExporter
                     .GetTransactionsAsync(accounts[0].Id, expand: "merchant", paginationOptions: monzo.PaginationOptions)
                     .Result;
 
-                Console.WriteLine($"Found {transactions.Count} transactions to add.");
+                if (transactions.Count == 0)
+                {
+                    Console.WriteLine("No transactions found, exiting.");
+                    return;
+                }
 
-                // TODO - return if no transactions
+                Console.WriteLine($"Found {transactions.Count} transactions to add.");
 
                 GoogleHelper google = new GoogleHelper(config);
 
