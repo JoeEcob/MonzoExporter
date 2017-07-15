@@ -11,6 +11,7 @@ using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
 using Mondo;
 using System;
+using System.Reflection;
 
 namespace MonzoExporter.Models
 {
@@ -19,7 +20,7 @@ namespace MonzoExporter.Models
         private IConfiguration _config;
         private SheetsService _sheetsService;
 
-        private string OAuthPath => Path.Combine(Directory.GetCurrentDirectory(), _config["google_oauth_path"]);
+        private string OAuthPath => Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), _config["google_oauth_path"]);
 
         public GoogleHelper(IConfiguration config)
         {

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Mondo;
 using Newtonsoft.Json;
 using System.Threading;
+using System.Reflection;
 
 namespace MonzoExporter.Models
 {
@@ -15,7 +16,7 @@ namespace MonzoExporter.Models
         private MondoAuthorizationClient _client;
         private AccessToken _accessToken;
 
-        private string OAuthPath => Path.Combine(Directory.GetCurrentDirectory(), _config["monzo_oauth_path"]);
+        private string OAuthPath => Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), _config["monzo_oauth_path"]);
 
         public MonzoHelper(IConfiguration config)
         {
