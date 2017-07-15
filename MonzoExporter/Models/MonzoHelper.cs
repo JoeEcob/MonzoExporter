@@ -5,12 +5,14 @@ using Microsoft.Extensions.Configuration;
 
 using Mondo;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace MonzoExporter.Models
 {
     class MonzoHelper
     {
         private IConfiguration _config;
+        private MondoAuthorizationClient _client;
         private AccessToken _accessToken;
 
         private string OAuthPath => Path.Combine(Directory.GetCurrentDirectory(), _config["monzo_oauth_path"]);
@@ -18,6 +20,7 @@ namespace MonzoExporter.Models
         public MonzoHelper(IConfiguration config)
         {
             _config = config;
+            _client = new MondoAuthorizationClient(config["monzo_client_id"], config["monzo_client_secret"]);
         }
 
         public AccessToken AccessToken
@@ -55,11 +58,19 @@ namespace MonzoExporter.Models
             }
         }
 
+        public async Task<AccessToken> RefreshToken()
+        {
+            var token = await _client.RefreshAccessTokenAsync(AccessToken.RefreshToken, CancellationToken.None);
+
+            _accessToken = token;
+            await StoreToken(token);
+
+            return token;
+        }
+
         private async Task<AccessToken> SetupNewToken()
         {
-            var authClient = new MondoAuthorizationClient(_config["monzo_client_id"], _config["monzo_client_secret"]);
-
-            var loginPageUrl = authClient.GetAuthorizeUrl(null, _config["monzo_redirect_uri"]);
+            var loginPageUrl = _client.GetAuthorizeUrl(null, _config["monzo_redirect_uri"]);
 
             Console.WriteLine("Visit the following URL to get the magic code:");
             Console.WriteLine(loginPageUrl);
@@ -67,15 +78,20 @@ namespace MonzoExporter.Models
 
             var code = Console.ReadLine();
 
-            var accessToken = await authClient.GetAccessTokenAsync(code, _config["monzo_redirect_uri"]);
+            var accessToken = await _client.GetAccessTokenAsync(code, _config["monzo_redirect_uri"]);
 
-            var file = File.CreateText(OAuthPath);
-            await file.WriteLineAsync(JsonConvert.SerializeObject(accessToken));
-            file.Dispose();
+            await StoreToken(accessToken);
 
             Console.WriteLine($"Successfully created {OAuthPath}!");
 
             return accessToken;
+        }
+
+        private async Task StoreToken(AccessToken token)
+        {
+            var file = File.CreateText(OAuthPath);
+            await file.WriteLineAsync(JsonConvert.SerializeObject(token));
+            file.Dispose();
         }
     }
 }

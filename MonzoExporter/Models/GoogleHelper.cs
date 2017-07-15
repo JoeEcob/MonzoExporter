@@ -9,6 +9,8 @@ using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
+using Mondo;
+using System;
 
 namespace MonzoExporter.Models
 {
@@ -53,6 +55,26 @@ namespace MonzoExporter.Models
 
                 return _sheetsService;
             }
+        }
+
+        public IList<IList<object>> BuildList(IList<Transaction> transactions)
+        {
+            var values = new List<IList<object>>();
+
+            foreach (var item in transactions)
+            {
+                var payee = item.Merchant?.Name == null ? item.Description : item.Merchant.Name;
+                var amount = Convert.ToDecimal(item.Amount) / 100; // Convert from pence to pounds
+                var balance = Convert.ToDecimal(item.AccountBalance) / 100;
+
+                var cells = new string[] { item.Created.ToString(), payee, item.Category, item.Notes, amount.ToString(), balance.ToString() };
+                var row = new List<object>(cells);
+
+                values.Add(row);
+                Console.WriteLine($"Added 1 row: {String.Join(" - ", cells)}");
+            }
+
+            return values;
         }
 
         public async Task<AppendValuesResponse> Append(IList<IList<object>> values)

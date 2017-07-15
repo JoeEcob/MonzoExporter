@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 using Mondo;
 using MonzoExporter.Models;
+using System.Threading.Tasks;
 
 namespace MonzoExporter
 {
@@ -15,47 +16,65 @@ namespace MonzoExporter
         {
             var config = new ConfigurationBuilder().AddJsonFile(ConfigFile).Build();
 
+            var transactions = GetTransactions(config).Result;
+
+            if (transactions.Count == 0)
+            {
+                Console.WriteLine("No transactions found, exiting.");
+                return;
+            }
+
+            Console.WriteLine($"Found {transactions.Count} transactions to add.");
+
+            switch ((args.Length > 0 ? args[0] : "").ToLower())
+            {
+                default:
+                    ProcessGoogle(config, transactions);
+                    break;
+            }
+        }
+
+        private static async Task<IList<Transaction>> GetTransactions(IConfiguration config, int iteration = 0)
+        {
             MonzoHelper monzo = new MonzoHelper(config);
 
-            using (var client = new MondoClient(monzo.AccessToken.Value))
+            IList<Transaction> transactions;
+
+            try
             {
-                IList<Account> accounts = client.GetAccountsAsync().Result;
-                IList<Transaction> transactions = client
-                    .GetTransactionsAsync(accounts[0].Id, expand: "merchant", paginationOptions: monzo.PaginationOptions)
-                    .Result;
-
-                if (transactions.Count == 0)
+                using (var client = new MondoClient(monzo.AccessToken.Value))
                 {
-                    Console.WriteLine("No transactions found, exiting.");
-                    return;
-                }
+                    IList<Account> accounts = await client.GetAccountsAsync();
 
-                Console.WriteLine($"Found {transactions.Count} transactions to add.");
-
-                GoogleHelper google = new GoogleHelper(config);
-
-                var values = new List<IList<object>>();
-                foreach (var item in transactions)
-                {
-                    var payee = item.Merchant?.Name == null ? item.Description : item.Merchant.Name;
-                    var amount = Convert.ToDecimal(item.Amount) / 100; // Convert from pence to pounds
-                    var balance = Convert.ToDecimal(item.AccountBalance) / 100;
-
-                    var cells = new string[] { item.Created.ToString(), payee, item.Category, item.Notes, amount.ToString(), balance.ToString() };
-                    var row = new List<object>(cells);
-
-                    values.Add(row);
-                    Console.WriteLine($"Added 1 row: {String.Join(" - ", cells)}");
-                }
-
-                var response = google.Append(values).Result;
-
-                Console.WriteLine("Finished appending values!");
-                Console.WriteLine($"Updated range: {response.Updates.UpdatedRange}");
-                Console.WriteLine($"Updated rows: {response.Updates.UpdatedRows}");
-                Console.WriteLine($"Updated columns: {response.Updates.UpdatedColumns}");
-                Console.WriteLine($"Updated cells: {response.Updates.UpdatedCells}");
+                    transactions = await client
+                        .GetTransactionsAsync(accounts[0].Id, expand: "merchant", paginationOptions: monzo.PaginationOptions);
+                };
             }
+            catch (MondoException)
+            {
+                if (iteration >= 2)
+                    throw new Exception("Unable to refresh access token");
+
+                await monzo.RefreshToken();
+                transactions = await GetTransactions(config, ++iteration);
+            }
+
+            return transactions;
+        }
+
+        private static void ProcessGoogle(IConfiguration config, IList<Transaction> transactions)
+        {
+            GoogleHelper google = new GoogleHelper(config);
+
+            var values = google.BuildList(transactions);
+
+            var response = google.Append(values).Result;
+
+            Console.WriteLine("Finished appending values!");
+            Console.WriteLine($"Updated range: {response.Updates.UpdatedRange}");
+            Console.WriteLine($"Updated rows: {response.Updates.UpdatedRows}");
+            Console.WriteLine($"Updated columns: {response.Updates.UpdatedColumns}");
+            Console.WriteLine($"Updated cells: {response.Updates.UpdatedCells}");
         }
     }
 }
