@@ -17,7 +17,7 @@ namespace MonzoExporter
 
             MonzoHelper monzo = new MonzoHelper(config);
 
-            using (var client = new MondoClient(monzo.AccessToken().Result.Value))
+            using (var client = new MondoClient(monzo.AccessToken.Value))
             {
                 IList<Account> accounts = client.GetAccountsAsync().Result;
                 IList<Transaction> transactions = client

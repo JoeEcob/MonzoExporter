@@ -20,22 +20,25 @@ namespace MonzoExporter.Models
             _config = config;
         }
 
-        public async Task<AccessToken> AccessToken()
+        public AccessToken AccessToken
         {
-            if (_accessToken == null)
+            get
             {
-                try
+                if (_accessToken == null)
                 {
-                    var json = File.ReadAllText(OAuthPath);
-                    _accessToken = JsonConvert.DeserializeObject<AccessToken>(json);
+                    try
+                    {
+                        var json = File.ReadAllText(OAuthPath);
+                        _accessToken = JsonConvert.DeserializeObject<AccessToken>(json);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        _accessToken = SetupNewToken().Result;
+                    }
                 }
-                catch (FileNotFoundException)
-                {
-                    _accessToken = await SetupNewToken();
-                }
-            }
 
-            return _accessToken;
+                return _accessToken;
+            }
         }
 
         public PaginationOptions PaginationOptions

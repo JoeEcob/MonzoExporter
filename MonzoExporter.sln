@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonzoExporter", "MonzoExporter\MonzoExporter.csproj", "{1D6EACC0-E2C7-47A2-B301-79CCC0B91C61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonzoExporter", "MonzoExporter\MonzoExporter.csproj", "{1D6EACC0-E2C7-47A2-B301-79CCC0B91C61}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C94A1A61-E9C4-4F1F-9958-299927E00103}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
