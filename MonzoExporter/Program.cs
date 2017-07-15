@@ -34,8 +34,9 @@ namespace MonzoExporter
                 foreach (var item in transactions)
                 {
                     var description = item.Merchant?.Name == null ? item.Description : item.Merchant.Name;
+                    var amount = Convert.ToDecimal(item.Amount) / 100; // Convert from pence to pounds
 
-                    var cells = new string[] { description, item.Category, item.Amount.ToString(), item.Created.ToString() };
+                    var cells = new string[] { description, item.Category, amount.ToString(), item.Created.ToString() };
                     var row = new List<object>(cells);
 
                     values.Add(row);

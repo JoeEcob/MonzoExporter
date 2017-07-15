@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using Google.Apis.Util.Store;
 
 namespace MonzoExporter.Models
 {
@@ -14,6 +16,8 @@ namespace MonzoExporter.Models
     {
         private IConfiguration _config;
         private SheetsService _sheetsService;
+
+        private string OAuthPath => Path.Combine(Directory.GetCurrentDirectory(), _config["google_oauth_path"]);
 
         public GoogleHelper(IConfiguration config)
         {
@@ -36,7 +40,8 @@ namespace MonzoExporter.Models
                         secrets,
                         new[] { SheetsService.Scope.Spreadsheets },
                         "user",
-                        CancellationToken.None
+                        CancellationToken.None,
+                        new FileDataStore(OAuthPath, true)
                     ).Result;
 
                     _sheetsService = new SheetsService(new BaseClientService.Initializer()
@@ -61,7 +66,7 @@ namespace MonzoExporter.Models
             _config["google_spreadsheet_id"],
             _config["google_spreadsheet_range"]);
 
-            request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
+            request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
             
             return await request.ExecuteAsync();
         }
