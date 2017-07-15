@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.27.1.918" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.2" />
+    <PackageReference Include="Mondo" Version="0.6.0.100" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+</Project>
