@@ -28,6 +28,9 @@ namespace MonzoExporter
 
             switch ((args.Length > 0 ? args[0] : "").ToLower())
             {
+                case "dry-run":
+                    DryRun(transactions);
+                    break;
                 default:
                     ProcessGoogle(config, transactions);
                     break;
@@ -75,6 +78,16 @@ namespace MonzoExporter
             Console.WriteLine($"Updated rows: {response.Updates.UpdatedRows}");
             Console.WriteLine($"Updated columns: {response.Updates.UpdatedColumns}");
             Console.WriteLine($"Updated cells: {response.Updates.UpdatedCells}");
+        }
+
+        private static void DryRun(IList<Transaction> transactions)
+        {
+            Console.WriteLine("Dry run mode enabled.");
+
+            foreach (var transaction in transactions)
+            {
+                Console.WriteLine($"{transaction.Created} {transaction.Category} {transaction.Amount} {transaction.Description}");
+            }
         }
     }
 }
