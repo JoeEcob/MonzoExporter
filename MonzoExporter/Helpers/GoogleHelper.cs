@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
@@ -10,17 +9,18 @@ using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
 using Mondo;
+using MonzoExporter.Models;
 
-namespace MonzoExporter.Models
+namespace MonzoExporter.Helpers
 {
     class GoogleHelper
     {
-        private IConfiguration _config;
+        private AppSettings _config;
         private SheetsService _sheetsService;
 
-        private string OAuthPath => _config["oauth_path"];
+        private string OAuthPath => _config.OAuthPath;
 
-        public GoogleHelper(IConfiguration config)
+        public GoogleHelper(AppSettings config)
         {
             _config = config;
         }
@@ -33,8 +33,8 @@ namespace MonzoExporter.Models
                 {
                     var secrets = new ClientSecrets
                     {
-                        ClientId = _config["google_client_id"],
-                        ClientSecret = _config["google_client_secret"]
+                        ClientId = _config.GoogleClientId,
+                        ClientSecret = _config.GoogleClientSecret
                     };
 
                     var credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
@@ -81,11 +81,11 @@ namespace MonzoExporter.Models
             var request = SheetsService.Spreadsheets.Values.Append(new ValueRange
             {
                 MajorDimension = "ROWS",
-                Range = _config["google_spreadsheet_range"],
+                Range = _config.GoogleSpreadsheetRange,
                 Values = values
             },
-            _config["google_spreadsheet_id"],
-            _config["google_spreadsheet_range"]);
+            _config.GoogleSpreadsheetId,
+            _config.GoogleSpreadsheetRange);
 
             request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
             

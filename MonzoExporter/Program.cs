@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 
 using Mondo;
-using MonzoExporter.Models;
+using MonzoExporter.Helpers;
 using System.Threading.Tasks;
+using MonzoExporter.Models;
 
 namespace MonzoExporter
 {
@@ -14,7 +15,7 @@ namespace MonzoExporter
 
         static void Main(string[] args)
         {
-            var config = new ConfigurationBuilder().AddJsonFile(ConfigFile).Build();
+            var config = GetConfig();
 
             var transactions = GetTransactions(config).Result;
 
@@ -29,7 +30,7 @@ namespace MonzoExporter
             switch ((args.Length > 0 ? args[0] : "").ToLower())
             {
                 case "google":
-                    ProcessGoogle(config, transactions);
+                    ProcessGoogle(config, transactions).RunSynchronously();
                     break;
                 default:
                     DryRun(transactions);
@@ -37,7 +38,16 @@ namespace MonzoExporter
             }
         }
 
-        private static async Task<IList<Transaction>> GetTransactions(IConfiguration config, int iteration = 0)
+        private static AppSettings GetConfig()
+        {
+            var builder = new ConfigurationBuilder().AddJsonFile(ConfigFile).Build();
+            var config = new AppSettings();
+            builder.Bind(config);
+
+            return config;
+        }
+
+        private static async Task<IList<Transaction>> GetTransactions(AppSettings config, int iteration = 0)
         {
             MonzoHelper monzo = new MonzoHelper(config);
 
@@ -65,13 +75,13 @@ namespace MonzoExporter
             return transactions;
         }
 
-        private static void ProcessGoogle(IConfiguration config, IList<Transaction> transactions)
+        private static async Task ProcessGoogle(AppSettings config, IList<Transaction> transactions)
         {
             GoogleHelper google = new GoogleHelper(config);
 
             var values = google.BuildList(transactions);
 
-            var response = google.Append(values).Result;
+            var response = await google.Append(values);
 
             Console.WriteLine("Finished appending values!");
             Console.WriteLine($"Updated range: {response.Updates.UpdatedRange}");

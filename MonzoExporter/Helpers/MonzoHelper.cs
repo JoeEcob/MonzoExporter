@@ -1,26 +1,26 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 using Mondo;
 using Newtonsoft.Json;
 using System.Threading;
+using MonzoExporter.Models;
 
-namespace MonzoExporter.Models
+namespace MonzoExporter.Helpers
 {
     class MonzoHelper
     {
-        private IConfiguration _config;
+        private AppSettings _config;
         private MondoAuthorizationClient _client;
         private AccessToken _accessToken;
 
-        private string OAuthPath => Path.Combine(_config["oauth_path"], "monzo-oauth.json");
+        private string OAuthPath => Path.Combine(_config.OAuthPath, "monzo-oauth.json");
 
-        public MonzoHelper(IConfiguration config)
+        public MonzoHelper(AppSettings config)
         {
             _config = config;
-            _client = new MondoAuthorizationClient(config["monzo_client_id"], config["monzo_client_secret"]);
+            _client = new MondoAuthorizationClient(_config.MonzoClientId, _config.MonzoClientSecret);
         }
 
         public AccessToken AccessToken
@@ -70,7 +70,7 @@ namespace MonzoExporter.Models
 
         private async Task<AccessToken> SetupNewToken()
         {
-            var loginPageUrl = _client.GetAuthorizeUrl(null, _config["monzo_redirect_uri"]);
+            var loginPageUrl = _client.GetAuthorizeUrl(null, _config.MonzoRedirectUri);
 
             Console.WriteLine("Visit the following URL to get the magic code:");
             Console.WriteLine(loginPageUrl);
@@ -78,7 +78,7 @@ namespace MonzoExporter.Models
 
             var code = Console.ReadLine();
 
-            var accessToken = await _client.GetAccessTokenAsync(code, _config["monzo_redirect_uri"]);
+            var accessToken = await _client.GetAccessTokenAsync(code, _config.MonzoRedirectUri);
 
             await StoreToken(accessToken);
 
