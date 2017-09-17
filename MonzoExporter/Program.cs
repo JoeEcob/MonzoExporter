@@ -28,11 +28,11 @@ namespace MonzoExporter
 
             switch ((args.Length > 0 ? args[0] : "").ToLower())
             {
-                case "dry-run":
-                    DryRun(transactions);
+                case "google":
+                    ProcessGoogle(config, transactions);
                     break;
                 default:
-                    ProcessGoogle(config, transactions);
+                    DryRun(transactions);
                     break;
             }
         }

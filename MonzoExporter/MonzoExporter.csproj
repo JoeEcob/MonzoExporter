@@ -9,18 +9,12 @@
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.29.1.980" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
-    <PackageReference Include="Mondo" Version="0.6.0.100" />
+    <PackageReference Include="Mondo" Version="0.5.0.100" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="google_oauth\Google.Apis.Auth.OAuth2.Responses.TokenResponse-monzo-exporter">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="monzo_oauth.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
