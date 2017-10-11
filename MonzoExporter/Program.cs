@@ -30,7 +30,7 @@ namespace MonzoExporter
             switch ((args.Length > 0 ? args[0] : "").ToLower())
             {
                 case "google":
-                    ProcessGoogle(config, transactions).RunSynchronously();
+                    ProcessGoogle(config, transactions);
                     break;
                 default:
                     DryRun(transactions);
@@ -75,13 +75,13 @@ namespace MonzoExporter
             return transactions;
         }
 
-        private static async Task ProcessGoogle(AppSettings config, IList<Transaction> transactions)
+        private static void ProcessGoogle(AppSettings config, IList<Transaction> transactions)
         {
             GoogleHelper google = new GoogleHelper(config);
 
             var values = google.BuildList(transactions);
 
-            var response = await google.Append(values);
+            var response = google.Append(values).Result;
 
             Console.WriteLine("Finished appending values!");
             Console.WriteLine($"Updated range: {response.Updates.UpdatedRange}");
