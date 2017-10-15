@@ -66,7 +66,7 @@ namespace MonzoExporter.Helpers
                 var amount = Convert.ToDecimal(item.Amount) / 100; // Convert from pence to pounds
                 var balance = Convert.ToDecimal(item.AccountBalance) / 100;
 
-                var cells = new string[] { item.Created.ToString(), payee, item.Category, item.Notes, amount.ToString(), balance.ToString() };
+                var cells = new string[] { item.Created.ToString("O"), payee, item.Category, item.Notes, amount.ToString(), balance.ToString() };
                 var row = new List<object>(cells);
 
                 values.Add(row);

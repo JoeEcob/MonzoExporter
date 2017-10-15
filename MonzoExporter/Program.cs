@@ -96,7 +96,7 @@ namespace MonzoExporter
 
             foreach (var transaction in transactions)
             {
-                Console.WriteLine($"{transaction.Created} {transaction.Category} {transaction.Amount} {transaction.Description}");
+                Console.WriteLine($"{transaction.Created.ToString("O")} {transaction.Category} {transaction.Amount} {transaction.Description}");
             }
         }
     }
