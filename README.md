@@ -10,15 +10,14 @@ Add your application keys to a `appsettings.json` file in the project root:
 
 ```JSON
 {
-  "google_client_id": "abc123.apps.googleusercontent.com",
-  "google_client_secret": "abc123",
-  "google_oauth_path": "google_oauth",
-  "google_spreadsheet_id": "abc123",
-  "google_spreadsheet_range": "Transactions!A2:A",
-  "monzo_client_id": "abc123",
-  "monzo_client_secret": "abc123",
-  "monzo_oauth_path": "monzo_oauth.json",
-  "monzo_redirect_uri": "http://localhost"
+  "oauthPath": "~/.config/monzo-exporter/",
+  "googleClientId": "abc123.apps.googleusercontent.com",
+  "googleClientSecret": "abc123",
+  "googleSpreadsheetId": "abc123",
+  "googleSpreadsheetRange": "Transactions!A2:A",
+  "monzoClientId": "abc123",
+  "monzoClientSecret": "abc123",
+  "monzoRedirectUri": "http://localhost"
 }
 ```
 
