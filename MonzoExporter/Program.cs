@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.Extensions.Configuration;
 
 using Mondo;
@@ -96,7 +97,8 @@ namespace MonzoExporter
 
             foreach (var transaction in transactions)
             {
-                Console.WriteLine($"{transaction.Created.ToString("O")} {transaction.Category} {transaction.Amount} {transaction.Description}");
+                var created = transaction.Created.ToString("G", new CultureInfo("en-GB"));
+                Console.WriteLine($"{created} {transaction.Category} {transaction.Amount} {transaction.Description}");
             }
         }
     }

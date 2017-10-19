@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ namespace MonzoExporter.Helpers
 {
     class GoogleHelper
     {
-        private AppSettings _config;
+        private readonly AppSettings _config;
         private SheetsService _sheetsService;
 
         private string OAuthPath => _config.OAuthPath;
@@ -62,15 +63,16 @@ namespace MonzoExporter.Helpers
 
             foreach (var item in transactions)
             {
-                var payee = item.Merchant?.Name == null ? item.Description : item.Merchant.Name;
+                var created = item.Created.ToString("G", new CultureInfo("en-GB"));
+                var payee = item.Merchant?.Name ?? item.Description;
                 var amount = Convert.ToDecimal(item.Amount) / 100; // Convert from pence to pounds
                 var balance = Convert.ToDecimal(item.AccountBalance) / 100;
 
-                var cells = new string[] { item.Created.ToString("O"), payee, item.Category, item.Notes, amount.ToString(), balance.ToString() };
+                var cells = new[] { created, payee, item.Category, item.Notes, amount.ToString(), balance.ToString() };
                 var row = new List<object>(cells);
 
                 values.Add(row);
-                Console.WriteLine($"Added 1 row: {String.Join(" - ", cells)}");
+                Console.WriteLine($"Added 1 row: {string.Join(" - ", cells)}");
             }
 
             return values;
