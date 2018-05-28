@@ -2,17 +2,17 @@
 using System.IO;
 using System.Threading.Tasks;
 
-using Mondo;
+using Monzo;
 using Newtonsoft.Json;
 using System.Threading;
 using MonzoExporter.Models;
 
 namespace MonzoExporter.Helpers
 {
-    class MonzoHelper
+    internal class MonzoHelper
     {
-        private AppSettings _config;
-        private MondoAuthorizationClient _client;
+        private readonly AppSettings _config;
+        private readonly MonzoAuthorizationClient _client;
         private AccessToken _accessToken;
 
         private string OAuthPath => Path.Combine(_config.OAuthPath, "monzo-oauth.json");
@@ -20,7 +20,7 @@ namespace MonzoExporter.Helpers
         public MonzoHelper(AppSettings config)
         {
             _config = config;
-            _client = new MondoAuthorizationClient(_config.MonzoClientId, _config.MonzoClientSecret);
+            _client = new MonzoAuthorizationClient(_config.MonzoClientId, _config.MonzoClientSecret);
         }
 
         public AccessToken AccessToken

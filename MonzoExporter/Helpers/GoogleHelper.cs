@@ -9,12 +9,12 @@ using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
-using Mondo;
+using Monzo;
 using MonzoExporter.Models;
 
 namespace MonzoExporter.Helpers
 {
-    class GoogleHelper
+    internal class GoogleHelper
     {
         private readonly AppSettings _config;
         private SheetsService _sheetsService;

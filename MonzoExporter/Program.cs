@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Extensions.Configuration;
 
-using Mondo;
+using Monzo;
 using MonzoExporter.Helpers;
 using System.Threading.Tasks;
 using MonzoExporter.Models;
@@ -56,7 +56,7 @@ namespace MonzoExporter
 
             try
             {
-                using (var client = new MondoClient(monzo.AccessToken.Value))
+                using (var client = new MonzoClient(monzo.AccessToken.Value))
                 {
                     IList<Account> accounts = await client.GetAccountsAsync();
 
@@ -64,7 +64,7 @@ namespace MonzoExporter
                         .GetTransactionsAsync(accounts[0].Id, expand: "merchant", paginationOptions: monzo.PaginationOptions);
                 };
             }
-            catch (MondoException)
+            catch (MonzoException)
             {
                 if (iteration >= 2)
                     throw new Exception("Unable to refresh access token");
