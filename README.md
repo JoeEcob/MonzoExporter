@@ -1,8 +1,11 @@
 # Monzo Exporter
 
-A quick and dirty script for copying [Monzo](https://monzo.com/) transactions to [Google Sheets](https://www.google.com/sheets/about/).
+[![Build status](https://ci.appveyor.com/api/projects/status/hvt324v1nkjrtdev/branch/master?svg=true)](https://ci.appveyor.com/project/JoeEcob/monzoexporter/branch/master)
 
-Intended to be run once per day as a cron job to import the previous days transactions.
+A quick and dirty script for exporting [Monzo](https://monzo.com/) transactions to various formats. Currently supported are:
+
+* [Google Sheets](https://www.google.com/sheets/about/).
+* Csv (YNAB 4 format)
 
 ## Setup
 
@@ -17,7 +20,8 @@ Add your application keys to a `appsettings.json` file in the project root:
   "googleSpreadsheetRange": "Transactions!A2:A",
   "monzoClientId": "abc123",
   "monzoClientSecret": "abc123",
-  "monzoRedirectUri": "http://localhost"
+  "monzoRedirectUri": "http://localhost",
+  "csvExportPath": "~/monzo-exporter.csv"
 }
 ```
 

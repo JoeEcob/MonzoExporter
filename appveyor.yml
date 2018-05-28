@@ -1,0 +1,18 @@
+version: 1.0.{build}
+skip_tags: true
+image: Visual Studio 2017
+configuration: Release
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+before_build:
+- ps: |
+    Nuget sources Add -Name Monzo -Source https://ci.appveyor.com/nuget/monzo-net-u1afliycy5rp
+    dotnet restore
+build:
+  verbosity: minimal
