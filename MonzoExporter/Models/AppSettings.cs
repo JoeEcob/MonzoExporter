@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MonzoExporter.Models
 {
-    class AppSettings
+    internal class AppSettings
     {
         public string OAuthPath { get; set; }
 
@@ -16,5 +14,7 @@ namespace MonzoExporter.Models
         public string MonzoClientId { get; set; }
         public string MonzoClientSecret { get; set; }
         public string MonzoRedirectUri { get; set; }
+
+        public string CsvExportPath { get; set; }
     }
 }
