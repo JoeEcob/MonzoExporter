@@ -114,7 +114,10 @@ namespace MonzoExporter
             {
                 var formattedDate = transaction.Created.ToString("yyyy-MM-dd");
                 var amount = (decimal)transaction.Amount / 100;
-                csv.AppendLine($"{formattedDate},{transaction.Merchant.Name},{amount},{transaction.Notes}");
+                var name = transaction.Merchant?.Name
+                    ?? transaction.CounterParty?.Name
+                    ?? transaction.Metadata["pot_id"];
+                csv.AppendLine($"{formattedDate},{name},{amount},{transaction.Notes}");
             }
 
             File.WriteAllText(config.CsvExportPath, csv.ToString());
