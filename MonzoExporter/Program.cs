@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
@@ -11,6 +12,8 @@ using Monzo;
 using MonzoExporter.Helpers;
 using System.Threading.Tasks;
 using MonzoExporter.Models;
+using RestSharp;
+using RestSharp.Authenticators;
 
 namespace MonzoExporter
 {
@@ -22,23 +25,35 @@ namespace MonzoExporter
         {
             var config = GetConfig();
 
+            var type = args.Length > 0 ? args[0] : "";
+            var sinceTime = args.Length > 1 ? args[1] : null;
+
+            if (sinceTime != null && DateTime.TryParse(sinceTime, out var dateTime))
+            {
+                WriteLine($"Using custom since time: {dateTime:s}");
+                config.SinceTime = dateTime;
+            }
+
             var transactions = GetTransactions(config).Result;
 
             if (transactions.Count == 0)
             {
-                Console.WriteLine("No transactions found, exiting.");
+                WriteLine("No transactions found, exiting.");
                 return;
             }
 
-            Console.WriteLine($"Found {transactions.Count} transactions to add.");
+            WriteLine($"Found {transactions.Count} transactions to add.");
 
-            switch ((args.Length > 0 ? args[0] : "").ToLower())
+            switch (type.ToLower())
             {
                 case "google":
                     ProcessGoogle(config, transactions);
                     break;
                 case "csv":
                     ProcessCsv(config, transactions);
+                    break;
+                case "csv-to-email":
+                    ProcessCsvToEmail(config, transactions);
                     break;
                 default:
                     DryRun(transactions);
@@ -126,6 +141,22 @@ namespace MonzoExporter
             WriteLine($"{transactions.Count()} transactions exported to: {config.CsvExportPath}");
         }
 
+        private static void ProcessCsvToEmail(AppSettings config, IEnumerable<Transaction> transactions)
+        {
+            ProcessCsv(config, transactions);
+
+            if (!File.Exists(config.CsvExportPath))
+                return;
+
+            WriteLine("Sending email...");
+
+            var res = SendEmail(config, config.SinceTime);
+
+            File.Delete(config.CsvExportPath);
+
+            WriteLine($"All done! Response {res.StatusDescription}");
+        }
+
         private static void DryRun(IEnumerable<Transaction> transactions)
         {
             WriteLine("Dry run mode enabled.");
@@ -135,6 +166,25 @@ namespace MonzoExporter
                 var created = transaction.Created.ToString("G", new CultureInfo("en-GB"));
                 WriteLine($"{created} {transaction.Category} {transaction.Amount} {transaction.Description}");
             }
+        }
+
+        private static IRestResponse SendEmail(AppSettings config, DateTime? sinceTime)
+        {
+            var client = new RestClient
+            {
+                BaseUrl = new Uri("https://api.mailgun.net/v3"),
+                Authenticator = new HttpBasicAuthenticator("api", config.EmailApiKey)
+            };
+            var request = new RestRequest();
+            request.AddParameter("domain", config.EmailDomain, ParameterType.UrlSegment);
+            request.Resource = "{domain}/messages";
+            request.AddParameter("from", config.EmailFromAddress);
+            request.AddParameter("to", config.EmailToAddress);
+            request.AddParameter("subject", "Monzo Exporter Summary");
+            request.AddParameter("text", $"Monzo transactions since {sinceTime:s}");
+            request.AddFile("attachment", config.CsvExportPath);
+            request.Method = Method.POST;
+            return client.Execute(request);
         }
     }
 }

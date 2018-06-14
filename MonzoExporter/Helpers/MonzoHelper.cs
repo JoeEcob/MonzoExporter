@@ -45,18 +45,10 @@ namespace MonzoExporter.Helpers
         }
 
         public PaginationOptions PaginationOptions
-        {
-            get
+            => new PaginationOptions
             {
-                var yesterday = DateTime.Now.AddDays(-1);
-
-                return new PaginationOptions
-                {
-                    SinceTime = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0),
-                    BeforeTime = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 23, 59, 59)
-                };
-            }
-        }
+                SinceTime = _config.SinceTime
+            };
 
         public async Task<AccessToken> RefreshToken()
         {
