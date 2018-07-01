@@ -131,7 +131,8 @@ namespace MonzoExporter
                 var amount = (decimal)transaction.Amount / 100;
                 var name = transaction.Merchant?.Name
                     ?? transaction.CounterParty?.Name
-                    ?? transaction.Metadata["pot_id"];
+                    ?? (transaction.Metadata.ContainsKey("pot_id")
+                        ? transaction.Metadata["pot_id"] : transaction.Description);
                 csv.AppendLine($"{formattedDate},{name},{amount},{transaction.Notes}");
             }
 
