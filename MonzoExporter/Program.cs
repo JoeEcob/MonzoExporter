@@ -127,6 +127,9 @@ namespace MonzoExporter
 
             foreach (var transaction in transactions)
             {
+                if (transaction.DeclineReason != null || transaction.Amount == 0)
+                    continue;
+
                 var formattedDate = transaction.Created.ToString("yyyy-MM-dd");
                 var amount = (decimal)transaction.Amount / 100;
                 var name = transaction.Merchant?.Name
