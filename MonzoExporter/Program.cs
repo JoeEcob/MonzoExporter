@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
@@ -23,16 +22,13 @@ namespace MonzoExporter
 
         static void Main(string[] args)
         {
-            var config = GetConfig();
+            var config = GetConfig(args);
 
-            var type = args.Length > 0 ? args[0] : "";
-            var sinceTime = args.Length > 1 ? args[1] : null;
+            WriteLine($"Output format: {config.Type}");
+            WriteLine($"Fetching transactions since: {config.Since:O}");
 
-            if (sinceTime != null && DateTime.TryParse(sinceTime, out var dateTime))
-            {
-                WriteLine($"Using custom since time: {dateTime:s}");
-                config.SinceTime = dateTime;
-            }
+            if (config.Before != null)
+                WriteLine($"Fetching transactions before: {config.Before:O}");
 
             var transactions = GetTransactions(config).Result;
 
@@ -44,15 +40,15 @@ namespace MonzoExporter
 
             WriteLine($"Found {transactions.Count} transactions to add.");
 
-            switch (type.ToLower())
+            switch (config.Type)
             {
-                case "google":
+                case OutputFormat.GoogleSheets:
                     ProcessGoogle(config, transactions);
                     break;
-                case "csv":
+                case OutputFormat.Csv:
                     ProcessCsv(config, transactions);
                     break;
-                case "csv-to-email":
+                case OutputFormat.CsvToEmail:
                     ProcessCsvToEmail(config, transactions);
                     break;
                 default:
@@ -61,9 +57,13 @@ namespace MonzoExporter
             }
         }
 
-        private static AppSettings GetConfig()
+        private static AppSettings GetConfig(string[] commandLineArgs)
         {
-            var builder = new ConfigurationBuilder().AddJsonFile(ConfigFile).Build();
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile(ConfigFile)
+                .AddCommandLine(commandLineArgs)
+                .Build();
+
             var config = new AppSettings();
             builder.Bind(config);
 
@@ -151,7 +151,7 @@ namespace MonzoExporter
 
             WriteLine("Sending email...");
 
-            var res = SendEmail(config, config.SinceTime);
+            var res = SendEmail(config, config.Since);
 
             File.Delete(config.CsvExportPath);
 

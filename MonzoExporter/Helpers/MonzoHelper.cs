@@ -47,7 +47,8 @@ namespace MonzoExporter.Helpers
         public PaginationOptions PaginationOptions
             => new PaginationOptions
             {
-                SinceTime = _config.SinceTime
+                BeforeTime = _config.Before,
+                SinceTime = _config.Since
             };
 
         public async Task<AccessToken> RefreshToken()

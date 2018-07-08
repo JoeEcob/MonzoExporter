@@ -9,6 +9,7 @@
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.34.0.1240" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Monzo" Version="0.9.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
